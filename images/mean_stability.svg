@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="800" height="460">
+  <rect width="800" height="460" fill="#1e2433" rx="12"/>
+  <text x="400" y="40" font-size="19" fill="#e2e8f0" text-anchor="middle" font-weight="bold" font-family="monospace">Среднее vs медиана: влияние выброса</text>
+  <!-- Оси -->
+  <line x1="70" y1="370" x2="680" y2="370" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="70" y1="100" x2="70" y2="370" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Метки Y -->
+  <text x="58" y="375" font-size="12" fill="#94a3b8" text-anchor="end" font-family="monospace">0</text>
+  <text x="58" y="321" font-size="12" fill="#94a3b8" text-anchor="end" font-family="monospace">5</text>
+  <text x="58" y="267" font-size="12" fill="#94a3b8" text-anchor="end" font-family="monospace">10</text>
+  <text x="58" y="213" font-size="12" fill="#94a3b8" text-anchor="end" font-family="monospace">15</text>
+  <text x="58" y="159" font-size="12" fill="#94a3b8" text-anchor="end" font-family="monospace">20</text>
+  <!-- Столбцы: набор [2, 3, 4, 4, 5, 20] -->
+  <!-- 2: h=2/20*270=27 -->
+  <rect x="100" y="343" width="70" height="27" fill="#4a9eff" opacity="0.8" rx="4"/>
+  <text x="135" y="338" font-size="13" fill="#4a9eff" text-anchor="middle" font-family="monospace">2</text>
+  <text x="135" y="390" font-size="12" fill="#94a3b8" text-anchor="middle" font-family="monospace">x₁</text>
+  <!-- 3: h=3/20*270=40.5 -->
+  <rect x="190" y="329" width="70" height="41" fill="#4a9eff" opacity="0.8" rx="4"/>
+  <text x="225" y="324" font-size="13" fill="#4a9eff" text-anchor="middle" font-family="monospace">3</text>
+  <text x="225" y="390" font-size="12" fill="#94a3b8" text-anchor="middle" font-family="monospace">x₂</text>
+  <!-- 4: h=54 -->
+  <rect x="280" y="316" width="70" height="54" fill="#4a9eff" opacity="0.8" rx="4"/>
+  <text x="315" y="311" font-size="13" fill="#4a9eff" text-anchor="middle" font-family="monospace">4</text>
+  <text x="315" y="390" font-size="12" fill="#94a3b8" text-anchor="middle" font-family="monospace">x₃</text>
+  <!-- 4: h=54 -->
+  <rect x="370" y="316" width="70" height="54" fill="#4a9eff" opacity="0.8" rx="4"/>
+  <text x="405" y="311" font-size="13" fill="#4a9eff" text-anchor="middle" font-family="monospace">4</text>
+  <text x="405" y="390" font-size="12" fill="#94a3b8" text-anchor="middle" font-family="monospace">x₄</text>
+  <!-- 5: h=67.5 -->
+  <rect x="460" y="302" width="70" height="68" fill="#4a9eff" opacity="0.8" rx="4"/>
+  <text x="495" y="297" font-size="13" fill="#4a9eff" text-anchor="middle" font-family="monospace">5</text>
+  <text x="495" y="390" font-size="12" fill="#94a3b8" text-anchor="middle" font-family="monospace">x₅</text>
+  <!-- 20: h=270 — ВЫБРОС -->
+  <rect x="550" y="100" width="70" height="270" fill="#f87171" opacity="0.85" rx="4"/>
+  <text x="585" y="92" font-size="13" fill="#f87171" text-anchor="middle" font-family="monospace" font-weight="bold">20 ← выброс</text>
+  <text x="585" y="390" font-size="12" fill="#f87171" text-anchor="middle" font-family="monospace">x₆</text>
+  <!-- Медиана = (4+4)/2 = 4.0: y = 370 - 4/20*270 = 370-54 = 316 -->
+  <line x1="70" y1="316" x2="680" y2="316" stroke="#34d399" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="690" y="320" font-size="14" fill="#34d399" font-family="monospace" font-weight="bold">Me=4</text>
+  <!-- x̄ = (2+3+4+4+5+20)/6=38/6≈6.3: y=370-6.3/20*270=370-85=285 -->
+  <line x1="70" y1="285" x2="680" y2="285" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="10,4"/>
+  <text x="690" y="289" font-size="14" fill="#fbbf24" font-family="monospace" font-weight="bold">x̄≈6.3</text>
+  <!-- Легенда -->
+  <line x1="80" y1="425" x2="116" y2="425" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="8,3"/>
+  <text x="122" y="430" font-size="13" fill="#fbbf24" font-family="monospace">Среднее x̄ ≈ 6.3 (смещено выбросом)</text>
+  <line x1="420" y1="425" x2="456" y2="425" stroke="#34d399" stroke-width="2" stroke-dasharray="5,2"/>
+  <text x="462" y="430" font-size="13" fill="#34d399" font-family="monospace">Медиана Me = 4 (устойчива)</text>
+</svg>
