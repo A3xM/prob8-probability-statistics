@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон больших чисел</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1e2433;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  /* ── COIN ── */
+  .coin-wrap {
+    perspective: 600px;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 28px;
+  }
+
+  .coin {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.05s linear;
+    cursor: pointer;
+  }
+
+  .coin-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    font-size: 40px;
+    font-weight: 900;
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.06), inset 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .coin-face.heads {
+    background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb, #1e3a8a);
+    color: #fff;
+  }
+
+  .coin-face.tails {
+    background: radial-gradient(circle at 35% 35%, #5eead4, #0d9488, #064e3b);
+    color: #fff;
+    transform: rotateY(180deg);
+  }
+
+  .coin-face small {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.8;
+    margin-top: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  .coin-result {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    height: 22px;
+    color: #94a3b8;
+    transition: all 0.2s;
+  }
+
+  .coin-result.heads { color: #60a5fa; }
+  .coin-result.tails { color: #2dd4bf; }
+
+  /* ── STATS ── */
+  .stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .stat {
+    background: #242d3f;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .stat-val {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-val.h { color: #60a5fa; }
+  .stat-val.t { color: #2dd4bf; }
+  .stat-val.n { color: #f1f5f9; }
+
+  .stat-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── CHART ── */
+  .chart-wrap {
+    width: 100%;
+    max-width: 480px;
+    background: #242d3f;
+    border: 1px solid #2d3748;
+    border-radius: 16px;
+    padding: 20px 20px 16px;
+    margin-bottom: 28px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  canvas#chart {
+    width: 100%;
+    height: 160px;
+    display: block;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── BUTTONS ── */
+  .buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: #242d3f;
+    color: #94a3b8;
+    border: 1px solid #2d3748;
+  }
+  .btn-secondary:hover { background: #2d3748; color: #e2e8f0; }
+
+  .btn-reset {
+    background: transparent;
+    color: #475569;
+    border: 1px solid #2d3748;
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+  .btn-reset:hover { color: #f87171; border-color: #f87171; }
+
+  .insight {
+    max-width: 480px;
+    font-size: 13px;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.6;
+    min-height: 40px;
+    transition: all 0.3s;
+    padding: 0 8px;
+  }
+
+  .insight span {
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .flipping { animation: pulse 0.08s ease infinite; }
+</style>
+</head>
+<body>
+
+<h1>Закон больших чисел</h1>
+<p class="subtitle">Чем больше бросков — тем ближе частота к вероятности</p>
+
+<div class="coin-wrap">
+  <div class="coin" id="coin">
+    <div class="coin-face heads">О<small>ОРЁЛ</small></div>
+    <div class="coin-face tails">Р<small>РЕШКА</small></div>
+  </div>
+</div>
+
+<div class="coin-result" id="result">Нажми «Бросить»</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-val n" id="total">0</div>
+    <div class="stat-label">Всего</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val h" id="heads-pct">—</div>
+    <div class="stat-label">Орёл %</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val t" id="tails-pct">—</div>
+    <div class="stat-label">Решка %</div>
+  </div>
+</div>
+
+<div class="chart-wrap">
+  <div class="chart-title">Частота выпадения орла</div>
+  <canvas id="chart"></canvas>
+  <div class="chart-legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#60a5fa"></div>
+      Частота орла
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#f59e0b; opacity:0.6"></div>
+      Теоретическая вероятность P = 0.5
+    </div>
+  </div>
+</div>
+
+<div class="buttons">
+  <button class="btn-primary" onclick="flipN(1)">Бросить ×1</button>
+  <button class="btn-secondary" onclick="flipN(10)">×10</button>
+  <button class="btn-secondary" onclick="flipN(100)">×100</button>
+  <button class="btn-secondary" onclick="flipN(1000)">×1000</button>
+  <button class="btn-reset" onclick="reset()">Сбросить</button>
+</div>
+
+<div class="insight" id="insight">Подбрось монету и понаблюдай за частотой</div>
+
+<script>
+const coinEl = document.getElementById('coin')
+const resultEl = document.getElementById('result')
+const totalEl = document.getElementById('total')
+const headsPctEl = document.getElementById('heads-pct')
+const tailsPctEl = document.getElementById('tails-pct')
+const insightEl = document.getElementById('insight')
+const canvas = document.getElementById('chart')
+const ctx = canvas.getContext('2d')
+
+let heads = 0, total = 0
+let history = [] // stores cumulative head frequency after each flip
+let animFrame = null
+let isFlipping = false
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1
+  const rect = canvas.getBoundingClientRect()
+  canvas.width = rect.width * dpr
+  canvas.height = rect.height * dpr
+  ctx.scale(dpr, dpr)
+  drawChart()
+}
+
+function flip() {
+  return Math.random() < 0.5
+}
+
+function animateCoin(isHeads, cb) {
+  let angle = 0
+  const speed = 55
+  const spins = 3 + Math.floor(Math.random() * 3)
+  const total_angle = spins * 360 + (isHeads ? 0 : 180)
+  coinEl.classList.add('flipping')
+
+  function step() {
+    angle += speed
+    coinEl.style.transform = `rotateY(${angle}deg)`
+    if (angle < total_angle) {
+      animFrame = requestAnimationFrame(step)
+    } else {
+      coinEl.style.transform = `rotateY(${isHeads ? 0 : 180}deg)`
+      coinEl.classList.remove('flipping')
+      cb()
+    }
+  }
+  animFrame = requestAnimationFrame(step)
+}
+
+function updateStats() {
+  const pct = total === 0 ? 0 : (heads / total * 100)
+  totalEl.textContent = total
+  headsPctEl.textContent = total ? pct.toFixed(1) + '%' : '—'
+  tailsPctEl.textContent = total ? (100 - pct).toFixed(1) + '%' : '—'
+
+  if (total >= 10) {
+    const diff = Math.abs(pct - 50).toFixed(1)
+    if (total >= 1000) {
+      insightEl.innerHTML = `<span>${total} бросков:</span> частота ${pct.toFixed(1)}% — отклонение от 50% всего <span>${diff}%</span>. Закон работает.`
+    } else if (total >= 100) {
+      insightEl.innerHTML = `<span>${total} бросков:</span> частота ${pct.toFixed(1)}%. Разброс уменьшается по мере роста числа опытов.`
+    } else {
+      insightEl.innerHTML = `<span>${total} бросков:</span> частота ${pct.toFixed(1)}%. Подбрось ещё — линия будет выравниваться.`
+    }
+  }
+}
+
+function drawChart() {
+  const w = canvas.getBoundingClientRect().width
+  const h = canvas.getBoundingClientRect().height
+  ctx.clearRect(0, 0, w, h)
+
+  const pad = { l: 38, r: 12, t: 10, b: 24 }
+  const cw = w - pad.l - pad.r
+  const ch = h - pad.t - pad.b
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'
+  ctx.lineWidth = 1
+  for (let y of [0, 0.25, 0.5, 0.75, 1]) {
+    const py = pad.t + ch - y * ch
+    ctx.beginPath()
+    ctx.moveTo(pad.l, py)
+    ctx.lineTo(pad.l + cw, py)
+    ctx.stroke()
+    ctx.fillStyle = '#475569'
+    ctx.font = '10px system-ui'
+    ctx.textAlign = 'right'
+    ctx.fillText((y * 100).toFixed(0) + '%', pad.l - 6, py + 3)
+  }
+
+  // 0.5 line
+  const py50 = pad.t + ch - 0.5 * ch
+  ctx.strokeStyle = 'rgba(245,158,11,0.45)'
+  ctx.lineWidth = 1.5
+  ctx.setLineDash([6, 4])
+  ctx.beginPath()
+  ctx.moveTo(pad.l, py50)
+  ctx.lineTo(pad.l + cw, py50)
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  if (history.length < 2) return
+
+  // Downsample if needed
+  const MAX_POINTS = 300
+  let pts = history
+  if (pts.length > MAX_POINTS) {
+    const step = Math.ceil(pts.length / MAX_POINTS)
+    pts = pts.filter((_, i) => i % step === 0 || i === pts.length - 1)
+  }
+
+  // Area under curve
+  const gradient = ctx.createLinearGradient(0, pad.t, 0, pad.t + ch)
+  gradient.addColorStop(0, 'rgba(96,165,250,0.25)')
+  gradient.addColorStop(1, 'rgba(96,165,250,0.02)')
+
+  ctx.beginPath()
+  pts.forEach((v, i) => {
+    const x = pad.l + (i / (pts.length - 1)) * cw
+    const y = pad.t + ch - v * ch
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+  })
+  ctx.lineTo(pad.l + cw, pad.t + ch)
+  ctx.lineTo(pad.l, pad.t + ch)
+  ctx.closePath()
+  ctx.fillStyle = gradient
+  ctx.fill()
+
+  // Line
+  ctx.strokeStyle = '#60a5fa'
+  ctx.lineWidth = 2
+  ctx.lineJoin = 'round'
+  ctx.beginPath()
+  pts.forEach((v, i) => {
+    const x = pad.l + (i / (pts.length - 1)) * cw
+    const y = pad.t + ch - v * ch
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+  })
+  ctx.stroke()
+
+  // Last dot
+  const lastX = pad.l + cw
+  const lastY = pad.t + ch - pts[pts.length - 1] * ch
+  ctx.beginPath()
+  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2)
+  ctx.fillStyle = '#60a5fa'
+  ctx.fill()
+}
+
+async function flipN(n) {
+  if (isFlipping) return
+  isFlipping = true
+
+  if (n === 1) {
+    const isHeads = flip()
+    await new Promise(resolve => animateCoin(isHeads, resolve))
+    isHeads ? heads++ : null
+    total++
+    history.push(heads / total)
+    resultEl.textContent = isHeads ? '← ОРЁЛ' : 'РЕШКА →'
+    resultEl.className = 'coin-result ' + (isHeads ? 'heads' : 'tails')
+    updateStats()
+    drawChart()
+  } else {
+    // Fast batch
+    coinEl.classList.add('flipping')
+    const results = []
+    for (let i = 0; i < n; i++) {
+      const h = flip()
+      results.push(h)
+      if (h) heads++
+      total++
+      history.push(heads / total)
+    }
+    await new Promise(r => setTimeout(r, 400))
+    coinEl.classList.remove('flipping')
+    const lastHeads = results[results.length - 1]
+    coinEl.style.transform = `rotateY(${lastHeads ? 0 : 180}deg)`
+    resultEl.textContent = lastHeads ? `← ОРЁЛ (последний)` : `РЕШКА → (последний)`
+    resultEl.className = 'coin-result ' + (lastHeads ? 'heads' : 'tails')
+    updateStats()
+    drawChart()
+  }
+
+  isFlipping = false
+}
+
+function reset() {
+  if (animFrame) cancelAnimationFrame(animFrame)
+  heads = 0; total = 0; history = []
+  coinEl.style.transform = 'rotateY(0deg)'
+  coinEl.classList.remove('flipping')
+  resultEl.textContent = 'Нажми «Бросить»'
+  resultEl.className = 'coin-result'
+  totalEl.textContent = '0'
+  headsPctEl.textContent = '—'
+  tailsPctEl.textContent = '—'
+  insightEl.textContent = 'Подбрось монету и понаблюдай за частотой'
+  isFlipping = false
+  drawChart()
+}
+
+window.addEventListener('resize', resize)
+resize()
+</script>
+</body>
+</html>
